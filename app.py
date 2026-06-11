@@ -1,8 +1,6 @@
 """
 Модуль управления приложением.
-
-Содержит класс для организации
-циклического меню и взаимодействия с пользователем.
+Содержит класс для организации циклического меню и взаимодействия с пользователем.
 """
 
 from models import BallChain
@@ -10,10 +8,11 @@ from io_handler import InputHandler, InputError
 
 
 class Application:
-    """Главный класс приложения."""
+    """
+    Главный класс приложения, управляющий потоком выполнения и пользовательским интерфейсом.
+    """
 
     def __init__(self) -> None:
-        """Инициализация обработчика."""
         self.handler = InputHandler()
 
     def _print_header(self) -> None:
@@ -29,10 +28,10 @@ class Application:
             self._print_header()
             print("\nГЛАВНОЕ МЕНЮ:")
             print("  1. Ввести данные вручную")
-            print("  2. Загрузить данные из файла (.txt, .json, .csv)")
+            print("  2. Загрузить данные из файла (.txt)")
             print("  3. Выход из программы")
             print("-" * 60)
-
+            
             choice = input("-> Ваш выбор (1-3): ").strip()
 
             if choice == '1':
@@ -40,7 +39,7 @@ class Application:
             elif choice == '2':
                 self._process_file()
             elif choice == '3':
-                print("\n[УСПЕХ] Работа программы завершена.\n")
+                print("\n[УСПЕХ] Работа программы завершена. Успехов в учебе!\n")
                 break
             else:
                 print("\n[ОШИБКА] Некорректный выбор. Введите 1, 2 или 3.")
@@ -60,61 +59,55 @@ class Application:
     def _process_file(self) -> None:
         """Обрабатывает сценарий загрузки данных из файла или его создания."""
         print("\n[ИНФО] Загрузка данных из файла")
-        has_file = input(
-            "-> Файл уже существует? (y/yes - да, иначе будет создан новый): "
-        ).strip().lower()
-
+        has_file = input("-> Файл уже существует? (y/yes - да, иначе будет создан новый): ").strip().lower()
+        
         try:
             if has_file in ['y', 'yes', 'д', 'да', '1']:
-                filepath = input("Введите имя файла"
-                                 " (например, data.txt): ").strip()
+                filepath = input("-> Введите имя файла (например, data.txt): ").strip()
                 data_str = self.handler.read_from_file(filepath)
             else:
                 filepath = "auto_generated_data.txt"
                 print(f"\n[СИСТЕМА] Создание файла '{filepath}'...")
-
+                
                 try:
                     self.handler.create_example_file(filepath)
                     print(f"[УСПЕХ] Файл '{filepath}' успешно создан!")
                     data_str = self.handler.read_from_file(filepath)
                 except InputError as create_err:
                     print(f"\n[ОШИБКА] Не удалось создать файл: {create_err}")
-                    return
-
+                    # Исправление F-05: Добавлена пауза, чтобы пользователь успел прочитать ошибку
+                    input("\nНажмите Enter, чтобы вернуться в меню...")
+                    return 
+            
             colors = self.handler.parse_input(data_str)
             formatted_colors = " ".join(map(str, colors))
-
+            
             print("\n" + "=" * 60)
             print(" ОТЧЕТ О ЗАГРУЗКЕ ДАННЫХ:")
             print(f" * Файл: {filepath}")
             print(f" * Всего шариков: {len(colors)}")
             print(f" * Исходная последовательность: {formatted_colors}")
             print("=" * 60)
-
+            
             self._solve(colors)
-
+            
         except InputError as e:
             print(f"\n[ОШИБКА] {e}")
-        input("\nНажмите Enter, чтобы вернуться в меню...")
+            input("\nНажмите Enter, чтобы вернуться в меню...")
 
     def _solve(self, colors: list[int]) -> None:
         """
         Запускает алгоритм решения задачи и выводит детальный отчет.
-
-        Аргументы:
-            colors (list[int]): Список цветов шариков для обработки.
+        Исправление F-02: Убран лишний input() отсюда, он есть в вызывающих методах.
+        Исправление F-04: Убран блок try/except, скрывающий реальные баги.
         """
         print("\n[СИСТЕМА] Анализ цепочки...")
-        try:
-            chain = BallChain(colors)
-            total, log = chain.solve_with_log()
-
-            print("\n" + "-" * 60)
-            print(" ДЕТАЛЬНЫЙ ОТЧЕТ О ВЫЧИСЛЕНИЯХ:")
-            print("-" * 60)
-            for step_message in log:
-                print(step_message)
-            print("-" * 60)
-        except Exception as e:
-            print(f"\n[КРИТИЧЕСКАЯ ОШИБКА] Сбой в алгоритме: {e}")
-        input("\nНажмите Enter, чтобы вернуться в меню...")
+        chain = BallChain(colors)
+        total, log = chain.solve_with_log()
+        
+        print("\n" + "-" * 60)
+        print(" ДЕТАЛЬНЫЙ ОТЧЕТ О ВЫЧИСЛЕНИЯХ:")
+        print("-" * 60)
+        for step_message in log:
+            print(step_message)
+        print("-" * 60)
