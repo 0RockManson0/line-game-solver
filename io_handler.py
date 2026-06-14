@@ -91,6 +91,8 @@ class InputHandler:
             content = ""
             with open(safe_path, 'r', encoding='utf-8') as f:
                 while True:
+                    # Чтение файла чанками по 1 МБ для защиты от переполнения 
+                    # оперативной памяти (DoS) при открытии некорректно больших файлов.
                     chunk = f.read(1024 * 1024)
                     if not chunk:
                         break
