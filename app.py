@@ -29,7 +29,7 @@ class Application:
             self._print_header()
             print("\nГЛАВНОЕ МЕНЮ:")
             print("  1. Ввести данные вручную")
-            print("  2. Загрузить данные из файла (.txt)")
+            print("  2. Загрузить данные из файла (.txt, .csv)")
             print("  3. Выход из программы")
             print("-" * 60)
 
@@ -66,7 +66,7 @@ class Application:
 
         try:
             if has_file in ['y', 'yes', 'д', 'да', '1']:
-                filepath = input("Введите имя файла: ").strip()
+                filepath = input("Введите имя или путь файла: ").strip()
                 data_str = self.handler.read_from_file(filepath)
             else:
                 filepath = "auto_generated_data.txt"
