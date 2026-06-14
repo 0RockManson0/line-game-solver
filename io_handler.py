@@ -28,24 +28,23 @@ class InputHandler:
     def _validate_filepath(filepath: str) -> str:
         """
         Проверяет и нормализует путь к файлу.
-    
-        Разрешает указание папок и полных путей, но блокирует выход за пределы директории.
+
+        Уважает указанное пользователем расширение, добавляя .txt только если расширения нет.
         """
         filepath = filepath.strip()
         if not filepath:
             raise InputError("Имя файла не может быть пустым.")
-        
-        if ".." in filepath:
-            raise InputError("Использование '..' в пути к файлу запрещено "
-            "в целях безопасности.")
 
+        if ".." in filepath:
+            raise InputError("Использование '..' в пути к файлу запрещено.")
+  
         invalid_chars = ['<', '>', '"', '|', '?', '*']
         if any(char in filepath for char in invalid_chars):
             raise InputError("Путь к файлу содержит недопустимые символы.")
 
         if not (filepath.endswith('.txt') or filepath.endswith('.csv')):
             filepath += '.txt'
-            
+
         return filepath
 
     def parse_input(self, data_str: str) -> List[int]:
